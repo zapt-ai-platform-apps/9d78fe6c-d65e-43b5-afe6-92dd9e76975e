@@ -5,7 +5,14 @@ import { SolidMarkdown } from 'solid-markdown';
 import { useNavigate } from '@solidjs/router';
 
 function GeneratedContent() {
-  const { prompt, generatedContent, setGeneratedContent, loading, setLoading } = useContent();
+  const {
+    prompt,
+    contentType,
+    generatedContent,
+    setGeneratedContent,
+    loading,
+    setLoading,
+  } = useContent();
   const navigate = useNavigate();
 
   createEffect(() => {
@@ -18,8 +25,11 @@ function GeneratedContent() {
     const generateContent = async () => {
       setLoading(true);
       try {
+        const aiPrompt = `اكتب ${contentType()} حول الموضوع التالي: "${prompt()}".
+
+الرجاء التأكد من أن المحتوى مكتوب باحترافية عالية دون أخطاء لغوية وبأسلوب جذاب وبتنسيق احترافي.`;
         const result = await createEvent('chatgpt_request', {
-          prompt: prompt(),
+          prompt: aiPrompt,
           response_type: 'text',
         });
         setGeneratedContent(result);

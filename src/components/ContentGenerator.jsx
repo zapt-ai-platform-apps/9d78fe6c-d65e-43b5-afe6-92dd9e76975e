@@ -1,9 +1,10 @@
 import { useNavigate } from '@solidjs/router';
 import { useContent } from '../ContentContext';
+import { For } from 'solid-js';
 
 function ContentGenerator() {
   const navigate = useNavigate();
-  const { prompt, setPrompt, loading } = useContent();
+  const { prompt, setPrompt, contentType, setContentType, loading } = useContent();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -12,8 +13,28 @@ function ContentGenerator() {
     }
   };
 
+  const contentTypes = [
+    'مقال',
+    'قصة قصيرة',
+    'قصيدة',
+    'نص إعلاني',
+    'وصف منتج',
+    'منشور على وسائل التواصل الاجتماعي',
+  ];
+
   return (
     <form onSubmit={handleSubmit} class="w-full flex flex-col space-y-4">
+      <select
+        value={contentType()}
+        onChange={(e) => setContentType(e.target.value)}
+        class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer"
+      >
+        <For each={contentTypes}>
+          {(type) => (
+            <option value={type}>{type}</option>
+          )}
+        </For>
+      </select>
       <textarea
         placeholder="اكتب وصفًا أو موضوعًا للحصول على محتوى"
         value={prompt()}
