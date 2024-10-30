@@ -5,4 +5,5 @@
 body {
   font-family: 'Noto Sans Arabic', sans-serif;
   direction: rtl;
+  color: #1a202c; /* تأكد من تحديد لون النص */
 }

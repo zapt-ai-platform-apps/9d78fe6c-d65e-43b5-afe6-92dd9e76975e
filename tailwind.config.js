@@ -1,12 +1,9 @@
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['"Noto Sans Arabic"', 'ui-sans-serif', 'system-ui'],
+        sans: ['"Noto Sans Arabic"', 'ui-sans-serif', 'system-ui'],
       },
       colors: {
         primary: {

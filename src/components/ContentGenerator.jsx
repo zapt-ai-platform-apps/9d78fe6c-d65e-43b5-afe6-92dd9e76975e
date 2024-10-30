@@ -22,7 +22,9 @@ function ContentGenerator({ onGenerate, loading }) {
       <button
         type="submit"
         disabled={loading}
-        class={`w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        class={`w-full py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
+          loading ? 'opacity-50 cursor-not-allowed' : ''
+        }`}
       >
         {loading ? 'يتم الآن إنشاء المحتوى...' : 'إنشاء المحتوى'}
       </button>
