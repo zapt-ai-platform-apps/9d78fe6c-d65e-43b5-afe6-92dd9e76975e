@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@sentry/browser": "^8.35.0",
+    "@sentry/node": "^8.35.0",
     "@solidjs/router": "^0.8.4",
     "@zapt/zapt-js": "^1.0.5",
     "solid-icons": "^1.0.1",

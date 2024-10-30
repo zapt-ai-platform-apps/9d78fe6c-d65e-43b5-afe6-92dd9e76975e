@@ -11,7 +11,6 @@ Sentry.init({
   },
 });
 
-// مثال على وظيفة Vercel مع Sentry
 export default async function handler(req, res) {
   try {
     // منطق الـ API الخاص بك

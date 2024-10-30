@@ -3,9 +3,9 @@ import { SolidMarkdown } from 'solid-markdown';
 
 function GeneratedContent({ content }) {
   return (
-    <Show when={content}>
+    <Show when={content()}>
       <div class="mt-8 bg-white p-6 rounded-lg shadow-md overflow-auto">
-        <SolidMarkdown children={content} />
+        <SolidMarkdown children={content()} />
       </div>
     </Show>
   );

@@ -29,8 +29,8 @@ function App() {
       <div class="max-w-3xl mx-auto h-full flex flex-col">
         <Header />
         <div class="flex-1">
-          <ContentGenerator onGenerate={handleGenerateContent} loading={loading()} />
-          <GeneratedContent content={generatedContent()} />
+          <ContentGenerator onGenerate={handleGenerateContent} loading={loading} />
+          <GeneratedContent content={generatedContent} />
         </div>
       </div>
     </div>
