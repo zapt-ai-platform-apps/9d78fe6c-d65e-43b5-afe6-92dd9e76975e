@@ -1,6 +1,6 @@
 {
   "name": "arabic-content-generator",
-  "version": "1.0.2",
+  "version": "1.0.1",
   "description": "An intelligent Arabic content generator app",
   "type": "module",
   "scripts": {

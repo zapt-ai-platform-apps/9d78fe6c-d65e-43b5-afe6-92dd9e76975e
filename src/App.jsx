@@ -8,7 +8,7 @@ function App() {
   return (
     <ContentProvider>
       <Router>
-        <div class="min-h-screen bg-gradient-to-br from-purple-100 to-blue-100 p-4 text-gray-800">
+        <div class="h-full bg-gradient-to-br from-purple-100 to-blue-100 p-4 text-gray-800">
           <div class="max-w-3xl mx-auto h-full flex flex-col">
             <Header />
             <Routes>

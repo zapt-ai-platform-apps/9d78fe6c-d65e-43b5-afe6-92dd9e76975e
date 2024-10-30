@@ -4,7 +4,7 @@ import { createEvent } from '../supabaseClient';
 import { SolidMarkdown } from 'solid-markdown';
 import { useNavigate } from '@solidjs/router';
 import { saveAs } from 'file-saver';
-import { Document, Packer, Paragraph } from 'docx';
+import { Packer, Document, Paragraph } from 'docx';
 
 function GeneratedContent() {
   const {
@@ -16,11 +16,11 @@ function GeneratedContent() {
     setLoading,
   } = useContent();
   const navigate = useNavigate();
+
+  // الحالة الخاصة بالأزرار الجديدة
   const [audioUrl, setAudioUrl] = createSignal('');
-  const [isProcessingAudio, setIsProcessingAudio] = createSignal(false);
-  const [isCopying, setIsCopying] = createSignal(false);
-  const [isDownloading, setIsDownloading] = createSignal(false);
-  const [isRegenerating, setIsRegenerating] = createSignal(false);
+  const [audioLoading, setAudioLoading] = createSignal(false);
+  const [regenerating, setRegenerating] = createSignal(false);
 
   createEffect(() => {
     if (!prompt()) {
@@ -29,81 +29,14 @@ function GeneratedContent() {
       return;
     }
 
-    const generateContent = async () => {
-      setLoading(true);
-      try {
-        const aiPrompt = `اكتب ${contentType()} حول الموضوع التالي: "${prompt()}".
-        
-الرجاء التأكد من أن المحتوى مكتوب باحترافية عالية دون أخطاء لغوية وبأسلوب جذاب وبتنسيق احترافي.`;
-        const result = await createEvent('chatgpt_request', {
-          prompt: aiPrompt,
-          response_type: 'text',
-        });
-        setGeneratedContent(result);
-      } catch (error) {
-        console.error('Error generating content:', error);
-        // يمكنك إضافة معالجة للأخطاء هنا
-      } finally {
-        setLoading(false);
-      }
-    };
-
     generateContent();
   });
 
-  const handleCopy = async () => {
-    setIsCopying(true);
+  const generateContent = async () => {
+    setLoading(true);
     try {
-      await navigator.clipboard.writeText(generatedContent());
-    } catch (error) {
-      console.error('Error copying content:', error);
-    } finally {
-      setIsCopying(false);
-    }
-  };
-
-  const handleDownload = async () => {
-    setIsDownloading(true);
-    try {
-      const doc = new Document({
-        sections: [
-          {
-            properties: {},
-            children: [new Paragraph(generatedContent())],
-          },
-        ],
-      });
-      const blob = await Packer.toBlob(doc);
-      saveAs(blob, `${contentType()} - ${prompt().substring(0, 20)}.docx`);
-    } catch (error) {
-      console.error('Error downloading content:', error);
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
-  const handleListen = async () => {
-    setIsProcessingAudio(true);
-    try {
-      const result = await createEvent('text_to_speech', {
-        text: generatedContent(),
-      });
-      setAudioUrl(result);
-    } catch (error) {
-      console.error('Error generating audio:', error);
-    } finally {
-      setIsProcessingAudio(false);
-    }
-  };
-
-  const handleRegenerate = async () => {
-    setIsRegenerating(true);
-    try {
-      setGeneratedContent('');
-      setAudioUrl('');
-      setLoading(true);
       const aiPrompt = `اكتب ${contentType()} حول الموضوع التالي: "${prompt()}".
-      
+
 الرجاء التأكد من أن المحتوى مكتوب باحترافية عالية دون أخطاء لغوية وبأسلوب جذاب وبتنسيق احترافي.`;
       const result = await createEvent('chatgpt_request', {
         prompt: aiPrompt,
@@ -111,11 +44,55 @@ function GeneratedContent() {
       });
       setGeneratedContent(result);
     } catch (error) {
-      console.error('Error regenerating content:', error);
+      console.error('Error generating content:', error);
+      // يمكنك إضافة معالجة للأخطاء هنا
     } finally {
       setLoading(false);
-      setIsRegenerating(false);
     }
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(generatedContent()).then(
+      () => {
+        alert('تم نسخ المحتوى إلى الحافظة!');
+      },
+      (err) => {
+        console.error('Error copying text: ', err);
+      }
+    );
+  };
+
+  const handleDownload = async () => {
+    const doc = new Document({
+      sections: [
+        {
+          children: [new Paragraph(generatedContent())],
+        },
+      ],
+    });
+
+    const blob = await Packer.toBlob(doc);
+    saveAs(blob, 'المحتوى.docx');
+  };
+
+  const handleListen = async () => {
+    setAudioLoading(true);
+    try {
+      const result = await createEvent('text_to_speech', {
+        text: generatedContent(),
+      });
+      setAudioUrl(result);
+    } catch (error) {
+      console.error('Error converting text to speech:', error);
+    } finally {
+      setAudioLoading(false);
+    }
+  };
+
+  const handleRegenerate = async () => {
+    setRegenerating(true);
+    await generateContent();
+    setRegenerating(false);
   };
 
   const handleBack = () => {
@@ -123,61 +100,57 @@ function GeneratedContent() {
   };
 
   return (
-    <div class="flex-1 flex flex-col items-center justify-center w-full">
+    <div class="flex-1 flex flex-col items-center justify-center">
       <Show when={loading()}>
         <div class="text-center text-lg text-primary">يتم الآن إنشاء المحتوى...</div>
       </Show>
       <Show when={!loading() && generatedContent()}>
-        <div class="flex flex-col items-center w-full space-y-4">
-          <div class="flex space-x-2">
+        <div class="flex flex-col items-center">
+          <div class="flex space-x-2 mb-4">
             <button
               onClick={handleBack}
-              class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
+              class="px-4 py-2 bg-gray-300 rounded-lg hover:bg-gray-400 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
             >
               الرجوع
             </button>
             <button
               onClick={handleDownload}
-              disabled={isDownloading()}
-              class={`px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
-                isDownloading() ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
             >
-              {isDownloading() ? 'جاري التحميل...' : 'التحميل'}
+              التحميل
             </button>
             <button
               onClick={handleCopy}
-              disabled={isCopying()}
-              class={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
-                isCopying() ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer"
             >
-              {isCopying() ? 'جاري النسخ...' : 'نسخ'}
+              نسخ
             </button>
             <button
               onClick={handleListen}
-              disabled={isProcessingAudio()}
+              disabled={audioLoading()}
               class={`px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
-                isProcessingAudio() ? 'opacity-50 cursor-not-allowed' : ''
+                audioLoading() ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              {isProcessingAudio() ? 'جارٍ المعالجة...' : 'استماع'}
+              {audioLoading() ? 'جاري التحويل...' : 'استماع'}
             </button>
             <button
               onClick={handleRegenerate}
-              disabled={isRegenerating()}
+              disabled={regenerating()}
               class={`px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition duration-300 ease-in-out transform hover:scale-105 cursor-pointer ${
-                isRegenerating() ? 'opacity-50 cursor-not-allowed' : ''
+                regenerating() ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              {isRegenerating() ? 'جارٍ إعادة الإنشاء...' : 'إعادة الإنشاء'}
+              {regenerating() ? 'جاري إعادة الإنشاء...' : 'إعادة الإنشاء'}
             </button>
           </div>
+
           <div class="mt-4 bg-white p-6 rounded-lg shadow-md overflow-auto w-full">
             <SolidMarkdown children={generatedContent()} />
           </div>
+
           <Show when={audioUrl()}>
-            <div class="mt-4">
+            <div class="mt-4 w-full">
               <audio controls src={audioUrl()} class="w-full" />
             </div>
           </Show>
