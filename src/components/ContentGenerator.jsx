@@ -1,12 +1,14 @@
-import { createSignal } from 'solid-js';
+import { useNavigate } from '@solidjs/router';
+import { useContent } from '../ContentContext';
 
-function ContentGenerator({ onGenerate, loading }) {
-  const [prompt, setPrompt] = createSignal('');
+function ContentGenerator() {
+  const navigate = useNavigate();
+  const { prompt, setPrompt, loading } = useContent();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (prompt()) {
-      onGenerate(prompt());
+      navigate('/content');
     }
   };
 
