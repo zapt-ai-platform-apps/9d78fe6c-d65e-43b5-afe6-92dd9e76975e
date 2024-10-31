@@ -160,7 +160,6 @@ function GeneratedContent() {
             <div class="mt-4 w-full">
               <audio
                 ref={(el) => (audioRef = el)}
-                controls
                 src={audioUrl()}
                 class="w-full"
               />
