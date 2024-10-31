@@ -21,6 +21,7 @@ function GeneratedContent() {
   const [audioUrl, setAudioUrl] = createSignal('');
   const [audioLoading, setAudioLoading] = createSignal(false);
   const [regenerating, setRegenerating] = createSignal(false);
+  let audioRef;
 
   createEffect(() => {
     if (!prompt()) {
@@ -36,8 +37,8 @@ function GeneratedContent() {
     setLoading(true);
     try {
       const aiPrompt = `اكتب ${contentType()} حول الموضوع التالي: "${prompt()}".
-
-الرجاء التأكد من أن المحتوى مكتوب باحترافية عالية دون أخطاء لغوية وبأسلوب جذاب وبتنسيق احترافي.`;
+  
+  الرجاء التأكد من أن المحتوى مكتوب باحترافية عالية دون أخطاء لغوية وبأسلوب جذاب وبتنسيق احترافي.`;
       const result = await createEvent('chatgpt_request', {
         prompt: aiPrompt,
         response_type: 'text',
@@ -50,6 +51,12 @@ function GeneratedContent() {
       setLoading(false);
     }
   };
+
+  createEffect(() => {
+    if (audioUrl() && audioRef) {
+      audioRef.play();
+    }
+  });
 
   const handleCopy = () => {
     navigator.clipboard.writeText(generatedContent()).then(
@@ -151,7 +158,12 @@ function GeneratedContent() {
 
           <Show when={audioUrl()}>
             <div class="mt-4 w-full">
-              <audio controls src={audioUrl()} class="w-full" />
+              <audio
+                ref={(el) => (audioRef = el)}
+                controls
+                src={audioUrl()}
+                class="w-full"
+              />
             </div>
           </Show>
         </div>
